@@ -15,5 +15,6 @@ __all__ = [
     'S3Service',
     'LambdaService',
     'DynamoDBService',
-    'BedrockService'
+    'BedrockService',
+    'ConfigService'
 ]

@@ -93,7 +93,8 @@ class ReportGenerator:
             'Security Group Rules': [],
             'Lambda Functions': [],
             'DynamoDB Tables': [],
-            'Bedrock Models': []
+            'Bedrock Models': [],
+            'Config Services': []
         }
 
         for region_data in self.results.get('regions', {}).values():
@@ -123,6 +124,8 @@ class ReportGenerator:
                         regional_data['DynamoDB Tables'].extend(data)
                     elif service == 'bedrock':
                         regional_data['Bedrock Models'].extend(data)
+                    elif service == 'config':
+                        regional_data['Config Services'].extend(data)
 
         for sheet_name, data in regional_data.items():
             if data:

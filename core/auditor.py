@@ -12,6 +12,7 @@ from services.bedrock import BedrockService
 from services.iam import IAMService
 from services.s3 import S3Service
 from services.config import ConfigService
+from services.organizations import OrganizationsService
 
 class AWSAuditor:
     def __init__(self, session: boto3.Session, regions: List[str], services: List[str]):
@@ -40,6 +41,11 @@ class AWSAuditor:
             self.print_progress("\nAuditing S3 buckets...")
             s3_service = S3Service(self.session)
             global_results['s3'] = s3_service.audit()
+            
+        if 'organizations' in self.services:
+            self.print_progress("\nAuditing Organizations...")
+            org_service = OrganizationsService(self.session)
+            global_results['organizations'] = org_service.audit()
             
         return global_results
 

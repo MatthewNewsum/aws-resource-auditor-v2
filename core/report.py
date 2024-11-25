@@ -80,6 +80,13 @@ class ReportGenerator:
                 self._write_dataframe(writer, 'S3 Buckets', 
                                     self.results['global_services']['s3'],
                                     header_format)
+                
+            if 'organizations' in self.results['global_services']:
+                org_data = self.results['global_services']['organizations']
+                if 'accounts' in org_data:
+                    self._write_dataframe(writer, 'Organization Accounts', org_data['accounts'], header_format)
+                if 'policies' in org_data:
+                    self._write_dataframe(writer, 'Organization Policies', org_data['policies'], header_format)
 
     def _write_regional_resources(self, writer: pd.ExcelWriter, header_format: Any):
         regional_data = {

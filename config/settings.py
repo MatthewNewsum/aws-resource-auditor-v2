@@ -7,7 +7,8 @@ AVAILABLE_SERVICES = [
     's3',
     'lambda',
     'dynamodb',
-    'bedrock'
+    'bedrock',
+    'config'
 ]
 
 # Threading configuration

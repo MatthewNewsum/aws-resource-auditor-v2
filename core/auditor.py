@@ -11,6 +11,7 @@ from services.dynamodb import DynamoDBService
 from services.bedrock import BedrockService
 from services.iam import IAMService
 from services.s3 import S3Service
+from services.config import ConfigService
 
 class AWSAuditor:
     def __init__(self, session: boto3.Session, regions: List[str], services: List[str]):
@@ -116,6 +117,11 @@ class AWSAuditor:
                 self.print_progress("  Checking Bedrock resources...")
                 bedrock_service = BedrockService(self.session, region)
                 regional_results['bedrock'] = bedrock_service.audit()
+                
+            if 'config' in self.services:
+                self.print_progress("  Checking Config resources...")
+                config_service = ConfigService(self.session, region)
+                regional_results['config'] = config_service.audit()
 
             return regional_results
             

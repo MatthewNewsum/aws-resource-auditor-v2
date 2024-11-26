@@ -104,11 +104,22 @@ class ReportGenerator:
             'Config Services': [],
             'EMR Clusters': [],
             'EMR Steps': [],
-            'EMR Instance Groups': []
+            'EMR Instance Groups': [],
+            'Lightsail Instances': [],
+            'Lightsail Databases': [],
+            'Lightsail Containers': []
         }
 
         for region_data in self.results.get('regions', {}).values():
             for service, data in region_data.items():
+                if 'lightsail' in region_data:
+                    for resource in region_data['lightsail']:
+                        if resource['Resource Type'] == 'Instance':
+                            regional_data['Lightsail Instances'].append(resource)
+                        elif resource['Resource Type'] == 'Database':
+                            regional_data['Lightsail Databases'].append(resource)
+                        elif resource['Resource Type'] == 'Container':
+                            regional_data['Lightsail Containers'].append(resource)
                 if isinstance(data, list):
                     if service == 'ec2':
                         regional_data['EC2 Instances'].extend(data)

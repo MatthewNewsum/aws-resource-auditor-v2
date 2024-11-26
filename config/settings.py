@@ -9,7 +9,9 @@ AVAILABLE_SERVICES = [
     'dynamodb',
     'bedrock',
     'config',
-    'emr'
+    'emr',
+    'organizations',
+    'lightsail'
 ]
 
 # Threading configuration

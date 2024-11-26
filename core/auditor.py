@@ -11,7 +11,7 @@ from services.dynamodb import DynamoDBService
 from services.bedrock import BedrockService
 from services.iam import IAMService
 from services.s3 import S3Service
-from services.config import ConfigService
+from services.emr import EMRService
 from services.organizations import OrganizationsService
 
 class AWSAuditor:
@@ -41,7 +41,7 @@ class AWSAuditor:
             self.print_progress("\nAuditing S3 buckets...")
             s3_service = S3Service(self.session)
             global_results['s3'] = s3_service.audit()
-            
+
         if 'organizations' in self.services:
             self.print_progress("\nAuditing Organizations...")
             org_service = OrganizationsService(self.session)
@@ -78,6 +78,7 @@ class AWSAuditor:
                         self.print_progress(f"    Lambda functions: {len(result.get('lambda', []))}")
                         self.print_progress(f"    DynamoDB tables: {len(result.get('dynamodb', []))}")
                         self.print_progress(f"    Bedrock models: {len(result.get('bedrock', []))}")
+                        self.print_progress(f"    EMR clusters: {len(result.get('emr', []))}")
                         self.print_progress(f"Successfully processed region: {region}")
                     
                     self.print_progress(f"\nProgress: {processed_regions}/{len(self.regions)} regions processed")
@@ -123,11 +124,11 @@ class AWSAuditor:
                 self.print_progress("  Checking Bedrock resources...")
                 bedrock_service = BedrockService(self.session, region)
                 regional_results['bedrock'] = bedrock_service.audit()
-                
-            if 'config' in self.services:
-                self.print_progress("  Checking Config resources...")
-                config_service = ConfigService(self.session, region)
-                regional_results['config'] = config_service.audit()
+
+            if 'emr' in self.services:
+                self.print_progress("  Checking EMR clusters...")
+                emr_service = EMRService(self.session, region)
+                regional_results['emr'] = emr_service.audit()
 
             return regional_results
             

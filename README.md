@@ -5,6 +5,17 @@
 
 A comprehensive AWS infrastructure auditing tool that collects and reports on resources across multiple regions and services.
 
+## Preface
+
+- If you try to use this app its at your own risk
+- There is no support whatsoever
+- There is no warranty express or implied
+- I would appreciate suggestions to improve it so if you have ideas to help me make it better send them please
+- If theres a service you want I have not yet added let me know and ill see what i can do 
+
+## Known Issues
+- Some services will not produce any output at all if theres nothing to report on (EMR and Organizations are 2 examples).  I have created and tested these resources and they worked as I expected.
+
 ## Features
 
 - Multi-region resource discovery

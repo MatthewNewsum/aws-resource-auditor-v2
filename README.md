@@ -109,7 +109,10 @@ Required permissions:
                 "dynamodb:Describe*",
                 "bedrock:List*",
                 "bedrock:Get*",
-                "config:Describe*"
+                "config:Describe*",
+                "lightsail:GetInstances",
+                "lightsail:GetRelationalDatabases",
+                "lightsail:GetContainerServices"
             ],
             "Resource": "*"
         }

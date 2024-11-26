@@ -19,5 +19,6 @@ __all__ = [
     'BedrockService',
     'ConfigService',
     'OrganizationsService',
-    'EMRService'
+    'EMRService',
+    'LightsailService'
 ]

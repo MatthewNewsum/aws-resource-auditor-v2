@@ -8,7 +8,8 @@ AVAILABLE_SERVICES = [
     'lambda',
     'dynamodb',
     'bedrock',
-    'config'
+    'config',
+    'emr'
 ]
 
 # Threading configuration

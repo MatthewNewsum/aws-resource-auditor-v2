@@ -6,6 +6,7 @@ from .s3 import S3Service
 from .lambda_service import LambdaService
 from .dynamodb import DynamoDBService
 from .bedrock import BedrockService
+from .emr import EMRService
 
 __all__ = [
     'EC2Service',
@@ -17,5 +18,6 @@ __all__ = [
     'DynamoDBService',
     'BedrockService',
     'ConfigService',
-    'OrganizationsService'
+    'OrganizationsService',
+    'EMRService'
 ]

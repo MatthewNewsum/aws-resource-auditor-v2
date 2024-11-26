@@ -101,7 +101,10 @@ class ReportGenerator:
             'Lambda Functions': [],
             'DynamoDB Tables': [],
             'Bedrock Models': [],
-            'Config Services': []
+            'Config Services': [],
+            'EMR Clusters': [],
+            'EMR Steps': [],
+            'EMR Instance Groups': []
         }
 
         for region_data in self.results.get('regions', {}).values():
@@ -133,6 +136,26 @@ class ReportGenerator:
                         regional_data['Bedrock Models'].extend(data)
                     elif service == 'config':
                         regional_data['Config Services'].extend(data)
+                    elif service == 'emr':
+                        for cluster in data:
+                            # Main cluster info
+                            cluster_info = {k: v for k, v in cluster.items() 
+                                        if not isinstance(v, (list, dict))}
+                            regional_data['EMR Clusters'].append(cluster_info)
+                            
+                            # Instance groups
+                            if cluster.get('Instance Groups'):
+                                for group in cluster['Instance Groups']:
+                                    group['Cluster ID'] = cluster['Cluster ID']
+                                    group['Cluster Name'] = cluster['Name']
+                                    regional_data['EMR Instance Groups'].append(group)
+                            
+                            # Steps
+                            if cluster.get('Steps'):
+                                for step in cluster['Steps']:
+                                    step['Cluster ID'] = cluster['Cluster ID']
+                                    step['Cluster Name'] = cluster['Name']
+                                    regional_data['EMR Steps'].append(step)
 
         for sheet_name, data in regional_data.items():
             if data:
@@ -171,7 +194,8 @@ class ReportGenerator:
             {'Category': 'IAM Users', 'Count': len(self.results.get('global_services', {}).get('iam', {}).get('users', []))},
             {'Category': 'IAM Roles', 'Count': len(self.results.get('global_services', {}).get('iam', {}).get('roles', []))},
             {'Category': 'IAM Groups', 'Count': len(self.results.get('global_services', {}).get('iam', {}).get('groups', []))},
-            {'Category': 'S3 Buckets', 'Count': len(self.results.get('global_services', {}).get('s3', []))}
+            {'Category': 'S3 Buckets', 'Count': len(self.results.get('global_services', {}).get('s3', []))},
+            {'Category': 'EMR Clusters', 'Count': sum(len(r.get('emr', [])) for r in self.results['regions'].values())},
         ]
         self._write_dataframe(writer, 'Resource Counts', resource_counts, header_format)
 

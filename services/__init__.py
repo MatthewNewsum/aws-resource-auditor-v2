@@ -9,16 +9,16 @@ from .bedrock import BedrockService
 from .emr import EMRService
 
 __all__ = [
-    'EC2Service',
-    'RDSService',
-    'VPCService',
-    'IAMService',
-    'S3Service',
-    'LambdaService',
-    'DynamoDBService',
     'BedrockService',
     'ConfigService',
-    'OrganizationsService',
+    'DynamoDBService',
+    'EC2Service',
     'EMRService',
-    'LightsailService'
+    'IAMService',
+    'LambdaService',
+    'LightsailService',
+    'OrganizationsService',
+    'RDSService',
+    'S3Service',
+    'VPCService'    
 ]

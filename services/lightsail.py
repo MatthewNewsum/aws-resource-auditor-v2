@@ -1,15 +1,20 @@
+# services/lightsail.py
 from typing import Dict, List, Any
 from .base import AWSService
 from botocore.exceptions import ClientError
 
 class LightsailService(AWSService):
-    @property
+    @property 
     def service_name(self) -> str:
         return 'lightsail'
 
     def audit(self) -> List[Dict[str, Any]]:
-        resources = []
+        """Implement abstract audit method"""
         try:
+            # Check if Lightsail is supported in this region
+            self.client.get_regions()
+            resources = []
+            
             # Get instances
             instances = self._get_instances()
             resources.extend(instances)
@@ -23,31 +28,36 @@ class LightsailService(AWSService):
             resources.extend(containers)
             
             return resources
-        except Exception as e:
-            print(f"Error auditing Lightsail in {self.region}: {str(e)}")
+            
+        except ClientError as e:
+            if 'Could not connect to the endpoint URL' in str(e):
+                print(f"Lightsail is not available in region {self.region}")
+            else:
+                print(f"Error auditing Lightsail in {self.region}: {str(e)}")
             return []
 
     def _get_instances(self) -> List[Dict[str, Any]]:
+        """Get Lightsail instances for the region"""
         instances = []
         try:
             paginator = self.client.get_paginator('get_instances')
             for page in paginator.paginate():
-                for instance in page['instances']:
+                for instance in page.get('instances', []):
                     instances.append({
                         'Region': self.region,
                         'Resource Type': 'Instance',
-                        'Name': instance['name'],
-                        'ARN': instance['arn'],
-                        'Created': str(instance['createdAt']),
-                        'Status': instance['state']['name'],
-                        'Blueprint ID': instance['blueprintId'],
-                        'Bundle ID': instance['bundleId'],
+                        'Name': instance.get('name'),
+                        'ARN': instance.get('arn'),
+                        'Created': str(instance.get('createdAt')),
+                        'Status': instance.get('state', {}).get('name'),
+                        'Blueprint ID': instance.get('blueprintId'),
+                        'Bundle ID': instance.get('bundleId'),
                         'Public IP': instance.get('publicIpAddress', 'N/A'),
                         'Private IP': instance.get('privateIpAddress', 'N/A'),
-                        'Availability Zone': instance['location']['availabilityZone']
+                        'Availability Zone': instance.get('location', {}).get('availabilityZone')
                     })
-        except Exception as e:
-            print(f"Error getting Lightsail instances: {str(e)}")
+        except ClientError as e:
+            print(f"Error getting Lightsail instances in {self.region}: {str(e)}")
         return instances
 
     def _get_databases(self) -> List[Dict[str, Any]]:
@@ -55,41 +65,45 @@ class LightsailService(AWSService):
         try:
             paginator = self.client.get_paginator('get_relational_databases')
             for page in paginator.paginate():
-                for db in page['relationalDatabases']:
+                for db in page.get('relationalDatabases', []):
                     databases.append({
                         'Region': self.region,
                         'Resource Type': 'Database',
-                        'Name': db['name'],
-                        'ARN': db['arn'],
-                        'Created': str(db['createdAt']),
-                        'Status': db['state'],
-                        'Engine': f"{db['engine']} {db['engineVersion']}",
-                        'Master Username': db['masterUsername'],
-                        'Public': db['publiclyAccessible'],
-                        'Availability Zone': db['location']['availabilityZone']
+                        'Name': db.get('name'),
+                        'ARN': db.get('arn'),
+                        'Created': str(db.get('createdAt')),
+                        'Status': db.get('state'),
+                        'Engine': f"{db.get('engine')} {db.get('engineVersion')}",
+                        'Master Username': db.get('masterUsername'),
+                        'Public': db.get('publiclyAccessible'),
+                        'Availability Zone': db.get('location', {}).get('availabilityZone')
                     })
-        except Exception as e:
-            print(f"Error getting Lightsail databases: {str(e)}")
+        except ClientError as e:
+            if 'Could not connect to the endpoint URL' in str(e):
+                print(f"Note: Lightsail databases not available in region {self.region}")
+            else:
+                print(f"Error getting Lightsail databases in {self.region}: {str(e)}")
         return databases
 
     def _get_containers(self) -> List[Dict[str, Any]]:
         containers = []
         try:
-            paginator = self.client.get_paginator('get_container_services')
-            for page in paginator.paginate():
-                for container in page['containerServices']:
-                    containers.append({
-                        'Region': self.region,
-                        'Resource Type': 'Container',
-                        'Name': container['containerServiceName'],
-                        'ARN': container['arn'],
-                        'Created': str(container['createdAt']),
-                        'Status': container['state'],
-                        'Power': container['power'],
-                        'Scale': container['scale'],
-                        'Principal ARN': container['principalArn'],
-                        'Availability Zone': container['location']['availabilityZone']
-                    })
-        except Exception as e:
-            print(f"Error getting Lightsail containers: {str(e)}")
+            response = self.client.get_container_services()
+            for container in response.get('containerServices', []):
+                containers.append({
+                    'Region': self.region,
+                    'Resource Type': 'Container',
+                    'Name': container.get('containerServiceName'),
+                    'ARN': container.get('arn'),
+                    'Created': str(container.get('createdAt')),
+                    'Status': container.get('power'),
+                    'Scale': container.get('scale'),
+                    'Principal ARN': container.get('principalArn', 'N/A'),
+                    'Location': container.get('location', {}).get('regionName')
+                })
+        except ClientError as e:
+            if 'Could not connect to the endpoint URL' in str(e):
+                print(f"Note: Lightsail containers not available in region {self.region}")
+            else:
+                print(f"Error getting Lightsail containers in {self.region}: {str(e)}")
         return containers

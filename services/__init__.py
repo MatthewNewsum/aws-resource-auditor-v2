@@ -7,12 +7,14 @@ from .lambda_service import LambdaService
 from .dynamodb import DynamoDBService
 from .bedrock import BedrockService
 from .emr import EMRService
+from .elasticsearch import ElasticsearchService
 
 __all__ = [
     'BedrockService',
     'ConfigService',
     'DynamoDBService',
     'EC2Service',
+    'ElasticsearchService',
     'EMRService',
     'IAMService',
     'LambdaService',

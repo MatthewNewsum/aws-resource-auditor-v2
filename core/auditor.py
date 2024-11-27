@@ -14,6 +14,7 @@ from services.s3 import S3Service
 from services.emr import EMRService
 from services.organizations import OrganizationsService
 from services.lightsail import LightsailService
+from services.elasticsearch import ElasticsearchService
 
 class AWSAuditor:
     def __init__(self, session: boto3.Session, regions: List[str], services: List[str]):
@@ -135,8 +136,12 @@ class AWSAuditor:
                 self.print_progress("  Checking Lightsail resources...")
                 lightsail_service = LightsailService(self.session, region)
                 regional_results['lightsail'] = lightsail_service.audit()
-
-            return regional_results
+                
+            if 'elasticsearch' in self.services:
+                self.print_progress("  Checking Elasticsearch domains...")
+                elasticsearch_service = ElasticsearchService(self.session, region)
+                regional_results['elasticsearch'] = elasticsearch_service.audit()
+                return regional_results
             
         except Exception as e:
             print(f"Error in region {region}: {str(e)}")

@@ -15,7 +15,6 @@ A comprehensive AWS infrastructure auditing tool that collects and reports on re
 
 ## Known Issues
 - Some services will not produce any output at all if theres nothing to report on (EMR and Organizations are 2 examples).  I have created and tested these resources and they worked as I expected.
-- Error getting Lightsail info in certain regions is as a result of these services not being available in these regions and is to be expected.  Error Message: "Error in region xx-xx-xx: Could not connect to the endpoint URL: "https://lightsail.xx-xx-xx.amazonaws.com/"
 
 ## Features
 

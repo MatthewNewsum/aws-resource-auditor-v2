@@ -1,18 +1,17 @@
 # AWS Service configuration
 AVAILABLE_SERVICES = [
+    'ec2',
+    'rds',
+    'vpc',
+    'iam',
+    's3',
+    'lambda',
+    'dynamodb',
     'bedrock',
     'config',
-    'dynamodb',
-    'ec2',
-    'elasticsearch',
     'emr',
-    'iam',
-    'lambda',
-    'lightsail',
     'organizations',
-    'rds',
-    's3',
-    'vpc'
+    'lightsail'
 ]
 
 # Threading configuration

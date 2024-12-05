@@ -2,13 +2,19 @@
 import argparse
 import boto3
 import os
+import xlsxwriter
 from core.auditor import AWSAuditor
 from core.report import ReportGenerator
 from config.settings import AVAILABLE_SERVICES, DEFAULT_MAX_WORKERS
 
-def parse_arguments():
+def valid_regions(session: boto3.Session) -> list:
+    ec2 = session.client('ec2')
+    available_regions = [r['RegionName'] for r in ec2.describe_regions()['Regions']]
+    return available_regions
+
+def parse_arguments(regions: list):
     parser = argparse.ArgumentParser(description='AWS Resource Audit Tool')
-    parser.add_argument('--regions', type=str, 
+    parser.add_argument('--regions', choices=regions, nargs='+', type=str,
                        help='Comma-separated list of regions or "all"',
                        default='all')
     parser.add_argument('--services', type=str, 
@@ -19,27 +25,12 @@ def parse_arguments():
                        default='results')
     return parser.parse_args()
 
-def get_regions(session: boto3.Session, regions_arg: str) -> list:
-    ec2 = session.client('ec2')
-    available_regions = [r['RegionName'] for r in ec2.describe_regions()['Regions']]
-    
-    if regions_arg.lower() == 'all':
-        return available_regions
-        
-    requested_regions = regions_arg.split(',')
-    invalid_regions = [r for r in requested_regions if r not in available_regions]
-    
-    if invalid_regions:
-        raise ValueError(f"Invalid regions: {', '.join(invalid_regions)}")
-        
-    return requested_regions
-
 def main():
-    args = parse_arguments()
     session = boto3.Session()
+    regions = valid_regions(session)
+    args = parse_arguments(regions)
     
     try:
-        regions = get_regions(session, args.regions)
         services = args.services.lower().split(',') if args.services != 'all' else AVAILABLE_SERVICES
         
         auditor = AWSAuditor(session, regions, services)
